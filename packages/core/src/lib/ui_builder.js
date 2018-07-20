@@ -180,6 +180,15 @@ const ui_builder = function() {
     return docPattern;
   }
 
+  function _findObjInArray (array, key, value) {
+    for (var i = 0; i < array.length; i++) {
+      if (value === array[i][key]) {
+        return true;
+      }
+    }
+    return false
+  }
+
   /**
    * Registers flat patterns with the patternTypes object
    * This is a new menu group like atoms
@@ -187,15 +196,18 @@ const ui_builder = function() {
    * @param pattern - the pattern to register
    */
   function addPatternType(patternlab, pattern) {
-    patternlab.patternTypes.push({
-      patternTypeLC: pattern.patternGroup.toLowerCase(),
-      patternTypeUC:
-        pattern.patternGroup.charAt(0).toUpperCase() +
-        pattern.patternGroup.slice(1),
-      patternType: pattern.patternType,
-      patternTypeDash: pattern.patternGroup, //todo verify
-      patternTypeItems: [],
-    });
+    const obj = _findObjInArray(patternlab.patternTypes, 'patternTypeLC', pattern.patternGroup.toLowerCase())
+    if (!obj) {
+      patternlab.patternTypes.push({
+        patternTypeLC: pattern.patternGroup.toLowerCase(),
+        patternTypeUC:
+          pattern.patternGroup.charAt(0).toUpperCase() +
+          pattern.patternGroup.slice(1),
+        patternType: pattern.patternType,
+        patternTypeDash: pattern.patternGroup, //todo verify
+        patternTypeItems: [],
+      });
+    }
   }
 
   /**
@@ -262,12 +274,15 @@ const ui_builder = function() {
       patternSubtypeItems: [],
     };
     const patternType = getPatternType(patternlab, pattern);
-    const insertIndex = _.sortedIndexBy(
-      patternType.patternTypeItems,
-      newSubType,
-      'patternSubtype'
-    );
-    patternType.patternTypeItems.splice(insertIndex, 0, newSubType);
+    const obj = _findObjInArray(patternType.patternTypeItems, 'patternSubtypeLC', newSubType.patternSubtypeLC)
+    if (!obj) {
+      const insertIndex = _.sortedIndexBy(
+        patternType.patternTypeItems,
+        newSubType,
+        'patternSubtype'
+      );
+      patternType.patternTypeItems.splice(insertIndex, 0, newSubType);
+    }
   }
 
   /**
@@ -332,11 +347,14 @@ const ui_builder = function() {
     }
 
     const patternSubType = getPatternSubType(patternlab, pattern);
-    patternSubType.patternSubtypeItems.push(newSubTypeItem);
-    patternSubType.patternSubtypeItems = _.sortBy(
-      patternSubType.patternSubtypeItems,
-      ['order', 'name']
-    );
+    const obj = _findObjInArray(patternSubType.patternSubtypeItems, 'patternPartial', newSubTypeItem.patternPartial)
+    if (!obj) {
+      patternSubType.patternSubtypeItems.push(newSubTypeItem);
+      patternSubType.patternSubtypeItems = _.sortBy(
+        patternSubType.patternSubtypeItems,
+        ['order', 'name']
+      );
+    }
   }
 
   /**
